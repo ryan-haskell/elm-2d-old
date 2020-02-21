@@ -1,0 +1,19 @@
+{
+    "type": "package",
+    "name": "ryannhg/elm-2d",
+    "summary": "create 2D things with WebGL.",
+    "license": "BSD-3-Clause",
+    "version": "1.0.0",
+    "exposed-modules": [
+        "Elm2D"
+    ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
+    "dependencies": {
+        "elm/browser": "1.0.0 <= v < 2.0.0",
+        "elm/core": "1.0.0 <= v < 2.0.0",
+        "elm/html": "1.0.0 <= v < 2.0.0",
+        "elm-explorations/linear-algebra": "1.0.3 <= v < 2.0.0",
+        "elm-explorations/webgl": "1.1.1 <= v < 2.0.0"
+    },
+    "test-dependencies": {}
+}

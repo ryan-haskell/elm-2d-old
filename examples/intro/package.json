@@ -1,0 +1,18 @@
+{
+  "name": "intro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm install && npm run dev",
+    "build": "elm make src/Main.elm --optimize --output public/dist/elm.js",
+    "dev": "elm-live src/Main.elm -u -d public -- --debug --output public/dist/elm.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "elm": "0.19.1-3",
+    "elm-live": "4.0.2"
+  }
+}
