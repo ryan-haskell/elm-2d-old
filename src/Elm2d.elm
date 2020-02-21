@@ -1,4 +1,4 @@
-module Elm2d exposing
+module Elm2D exposing
     ( Canvas, canvas, resize, background
     , toHtml
     , Shape, draw, rectangle
