@@ -35,21 +35,61 @@ type alias Model =
 
 init : Flags -> ( Model, Cmd Msg )
 init { window } =
-    ( { canvas =
-            Elm2d.canvas
-                { size = window
-                , background = ( 0, 175, 125 )
-                }
-                |> Elm2d.draw
-                    (Elm2d.rectangle
-                        { color = ( 0, 75, 150 )
-                        , position = ( 100, 100 )
-                        , size = ( 48, 48 )
-                        }
-                    )
+    ( { canvas = canvas { window = window, x = 120, y = 50 }
       }
     , Cmd.none
     )
+
+
+canvas :
+    { window : { width : Int, height : Int }
+    , x : Int
+    , y : Int
+    }
+    -> Elm2d.Canvas
+canvas options =
+    Elm2d.canvas
+        { size = options.window
+        , background = ( 0, 175, 125 )
+        }
+        -- face
+        |> Elm2d.draw
+            (Elm2d.rectangle
+                { color = ( 220, 170, 120 )
+                , position = ( options.x, options.y )
+                , size = ( 48, 48 )
+                }
+            )
+        -- left eye
+        |> Elm2d.draw
+            (Elm2d.rectangle
+                { color = ( 255, 255, 255 )
+                , position = ( options.x + 8, options.y + 16 )
+                , size = ( 12, 16 )
+                }
+            )
+        |> Elm2d.draw
+            (Elm2d.rectangle
+                { color = ( 0, 0, 0 )
+                , position = ( options.x + 14, options.y + 16 )
+                , size = ( 6, 16 )
+                }
+            )
+        -- right eye
+        |> Elm2d.draw
+            (Elm2d.rectangle
+                { color = ( 255, 255, 255 )
+                , position = ( options.x + 28, options.y + 16 )
+                , size = ( 12, 16 )
+                }
+            )
+        |> Elm2d.draw
+            (Elm2d.rectangle
+                { color = ( 0, 0, 0 )
+                , position = ( options.x + 28, options.y + 16 )
+                , size = ( 6, 16 )
+                }
+            )
 
 
 type Msg
