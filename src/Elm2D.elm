@@ -160,11 +160,7 @@ texture options =
     Texture.loadWith
         (Texture.defaultOptions |> (\opts -> { opts | magnify = Texture.nearest }))
         options.url
-        |> Task.attempt
-            (\result ->
-                Result.toMaybe (Debug.log "result" result)
-                    |> options.onLoad
-            )
+        |> Task.attempt (Result.toMaybe >> options.onLoad)
 
 
 
