@@ -38,6 +38,9 @@ type alias Model =
         }
     , position : ( Float, Float )
     , keys : Set ( Float, Float )
+    , textures :
+        { veril : Maybe Elm2D.Texture
+        }
     }
 
 
@@ -53,8 +56,14 @@ init { window } =
             , toFloat window.height / 2 - 24
             )
       , keys = Set.empty
+      , textures =
+            { veril = Nothing
+            }
       }
-    , Cmd.none
+    , Elm2D.texture
+        { url = "/images/veril.png"
+        , onLoad = LoadedVerilTexture
+        }
     )
 
 
@@ -67,6 +76,7 @@ type Msg
     | PressedKey Key
     | ReleasedKey Key
     | GotRenderFrame Float
+    | LoadedVerilTexture (Maybe Elm2D.Texture)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -94,6 +104,11 @@ update msg model =
 
         GotRenderFrame timeElapsed ->
             ( { model | position = updatePosition timeElapsed model.position model.keys }
+            , Cmd.none
+            )
+
+        LoadedVerilTexture veril ->
+            ( { model | textures = { veril = veril } }
             , Cmd.none
             )
 
@@ -183,12 +198,13 @@ keyDecoder toMsg =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Elm2D Examples | Intro"
+    { title = "Elm2D | Intro"
     , body =
         [ Elm2D.toHtml <|
             canvas
                 { window = model.window
                 , position = Tuple.mapBoth round round model.position
+                , textures = model.textures
                 }
         , div
             [ Attr.style "position" "fixed"
@@ -212,55 +228,28 @@ view model =
 
 
 canvas :
-    { model
-        | window : { width : Int, height : Int }
-        , position : ( Int, Int )
+    { window : { width : Int, height : Int }
+    , position : ( Int, Int )
+    , textures :
+        { veril : Maybe Elm2D.Texture
+        }
     }
     -> Elm2D.Canvas
 canvas options =
-    let
-        ( x, y ) =
-            options.position
-    in
     Elm2D.canvas
         { size = options.window
         , background = ( 0, 175, 125 )
         }
-        -- face
-        |> Elm2D.draw
-            (Elm2D.rectangle
-                { color = ( 220, 170, 120 )
-                , position = ( x, y )
-                , size = ( 48, 48 )
-                }
-            )
-        -- left eye
-        |> Elm2D.draw
-            (Elm2D.rectangle
-                { color = ( 255, 255, 255 )
-                , position = ( x + 8, y + 16 )
-                , size = ( 12, 16 )
-                }
-            )
-        |> Elm2D.draw
-            (Elm2D.rectangle
-                { color = ( 0, 0, 0 )
-                , position = ( x + 14, y + 16 )
-                , size = ( 6, 16 )
-                }
-            )
-        -- right eye
-        |> Elm2D.draw
-            (Elm2D.rectangle
-                { color = ( 255, 255, 255 )
-                , position = ( x + 28, y + 16 )
-                , size = ( 12, 16 )
-                }
-            )
-        |> Elm2D.draw
-            (Elm2D.rectangle
-                { color = ( 0, 0, 0 )
-                , position = ( x + 28, y + 16 )
-                , size = ( 6, 16 )
-                }
-            )
+        (case options.textures.veril of
+            Just texture ->
+                [ Elm2D.sprite
+                    { texture = texture
+                    , selection = { position = ( 24, 0 ), size = ( 8, 8 ) }
+                    , position = options.position
+                    , size = ( 48, 48 )
+                    }
+                ]
+
+            Nothing ->
+                []
+        )
