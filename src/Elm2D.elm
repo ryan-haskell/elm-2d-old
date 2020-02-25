@@ -174,9 +174,6 @@ toHtml (Canvas c) =
         ]
         [ Attr.width (sizeWidth c.size)
         , Attr.height (sizeHeight c.size)
-        , c.background
-            |> rgbToString
-            |> Attr.style "background-color"
         ]
         (List.map (toEntity c.size) c.shapes)
 
@@ -372,6 +369,9 @@ spriteFragmentShader =
         varying vec2 vcoord;
         void main () {
             gl_FragColor = texture2D(texture, vcoord);
+            if (gl_FragColor.a == 0.0) {
+              discard;
+            }
         }
     |]
 
