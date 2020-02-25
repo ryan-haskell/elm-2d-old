@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm install && npm run dev",
-    "build": "elm make src/Main.elm --optimize --output public/dist/elm.js",
+    "build": "elm make src/Main.elm --debug --output public/dist/elm.js",
     "dev": "elm-live src/Main.elm -u -d public -- --debug --output public/dist/elm.js"
   },
   "keywords": [],
