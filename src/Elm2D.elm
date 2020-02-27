@@ -1,15 +1,12 @@
 module Elm2D exposing
-    ( Canvas, canvas, resize, background
-    , toHtml
+    ( Canvas, canvas, toHtml
     , Shape, rectangle, sprite
     , Texture, texture
     )
 
 {-|
 
-@docs Canvas, canvas, resize, background
-
-@docs toHtml
+@docs Canvas, canvas, toHtml
 
 @docs Shape, rectangle, sprite
 
@@ -51,16 +48,6 @@ canvas options shapes =
         , background = toColor options.background
         , shapes = shapes
         }
-
-
-resize : { width : Int, height : Int } -> Canvas -> Canvas
-resize size (Canvas c) =
-    Canvas { c | size = toSize size }
-
-
-background : ( Int, Int, Int ) -> Canvas -> Canvas
-background color (Canvas c) =
-    Canvas { c | background = toColor color }
 
 
 
