@@ -248,11 +248,10 @@ canvas options =
                     , position = options.position
                     , size = ( 48, 48 )
                     }
-                , Elm2D.sprite
+                , Elm2D.image
                     { texture = texture
-                    , selection = { position = ( 24, 0 ), size = ( 8, 8 ) }
                     , position = ( 400, 400 )
-                    , size = ( 48, 48 )
+                    , size = ( 4 * 96, 96 )
                     }
                 ]
 

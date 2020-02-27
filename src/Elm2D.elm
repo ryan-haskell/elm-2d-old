@@ -1,6 +1,6 @@
 module Elm2D exposing
     ( Canvas, canvas, toHtml
-    , Shape, rectangle, sprite
+    , Shape, rectangle, image, sprite
     , Texture, texture
     )
 
@@ -8,7 +8,7 @@ module Elm2D exposing
 
 @docs Canvas, canvas, toHtml
 
-@docs Shape, rectangle, sprite
+@docs Shape, rectangle, image, sprite
 
 @docs Texture, texture
 
@@ -56,6 +56,7 @@ canvas options shapes =
 
 type Shape
     = Rectangle RectangleOptions
+    | Image ImageOptions
     | Sprite SpriteOptions
 
 
@@ -82,6 +83,34 @@ rectangle options =
     in
     Rectangle
         { color = toColor options.color
+        , position = Position x y
+        , size = Size w h
+        }
+
+
+type alias ImageOptions =
+    { texture : Texture
+    , position : Position
+    , size : Size
+    }
+
+
+image :
+    { texture : Texture
+    , position : ( Int, Int )
+    , size : ( Int, Int )
+    }
+    -> Shape
+image options =
+    let
+        ( w, h ) =
+            Tuple.mapBoth toFloat toFloat options.size
+
+        ( x, y ) =
+            Tuple.mapBoth toFloat toFloat options.position
+    in
+    Image
+        { texture = options.texture
         , position = Position x y
         , size = Size w h
         }
@@ -175,6 +204,9 @@ toEntity size shape =
         Rectangle options ->
             viewRectangle size options
 
+        Image options ->
+            viewImage size options
+
         Sprite options ->
             viewSprite size options
 
@@ -260,6 +292,90 @@ rectangleFragmentShader =
         uniform vec3 color;
         void main() {
             gl_FragColor = vec4(color, 1);
+        }
+    |]
+
+
+
+-- RENDERING IMAGES
+
+
+type alias ImageVertex =
+    { position : Vec2
+    , coord : Vec2
+    }
+
+
+type alias ImageUniforms =
+    { texture : Texture
+    , canvas : Vec2
+    }
+
+
+type alias ImageVaryings =
+    { vcoord : Vec2
+    }
+
+
+viewImage : Size -> ImageOptions -> WebGL.Entity
+viewImage (Size canvasW canvasH) options =
+    let
+        uniforms : Texture -> ImageUniforms
+        uniforms texture_ =
+            { texture = texture_
+            , canvas = Vec2.vec2 (2 / canvasW) (2 / canvasH)
+            }
+
+        mesh : Size -> Position -> WebGL.Mesh ImageVertex
+        mesh (Size w h) (Position x y) =
+            let
+                ( textureWidth, textureHeight ) =
+                    Tuple.mapBoth toFloat toFloat (Texture.size options.texture)
+            in
+            WebGL.indexedTriangles
+                [ { position = Vec2.vec2 x y
+                  , coord = Vec2.vec2 0 0
+                  }
+                , { position = Vec2.vec2 (w + x) y
+                  , coord = Vec2.vec2 1 0
+                  }
+                , { position = Vec2.vec2 (w + x) (h + y)
+                  , coord = Vec2.vec2 1 1
+                  }
+                , { position = Vec2.vec2 x (h + y)
+                  , coord = Vec2.vec2 0 1
+                  }
+                ]
+                [ ( 0, 1, 2 ), ( 2, 3, 0 ) ]
+    in
+    WebGL.entity imageVertexShader imageFragmentShader (mesh options.size options.position) (uniforms options.texture)
+
+
+imageVertexShader : WebGL.Shader ImageVertex ImageUniforms ImageVaryings
+imageVertexShader =
+    [glsl|
+        attribute vec2 position;
+        attribute vec2 coord;
+        uniform vec2 canvas;
+        varying vec2 vcoord;
+        void main () {
+            gl_Position = vec4(canvas, 1, 1) * vec4(1, -1, 1, 1) * vec4(position, 0, 1.0) + vec4(-1, 1, 0, 0);
+            vcoord = coord.xy * vec2(1, -1);
+        }
+    |]
+
+
+imageFragmentShader : WebGL.Shader {} ImageUniforms ImageVaryings
+imageFragmentShader =
+    [glsl|
+        precision mediump float;
+        uniform sampler2D texture;
+        varying vec2 vcoord;
+        void main () {
+            gl_FragColor = texture2D(texture, vcoord);
+            if (gl_FragColor.a == 0.0) {
+              discard;
+            }
         }
     |]
 
